@@ -14,12 +14,12 @@ Per ogni partita il server memorizza in un file di log in formato  XML la data e
 
 **Client 1**
 
-![Client 1](resources\Client_1.png)
+![Client 1](resources/Client_1.png)
 
 **Client 2**
 
-![Client 2](resources\Client_2.png)
+![Client 2](resources/Client_2.png)
 
 **Server**
 
-![Server](resources\Server.png)
+![Server](resources/Server.png)
