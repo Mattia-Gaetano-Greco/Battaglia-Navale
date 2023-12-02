@@ -1,6 +1,5 @@
-//Importo i package necessari 
 import java.net.*;
-import java.io.*; 
+import java.io.*;
   
 public class TCPClient { 
   public void start()throws IOException { 
@@ -9,33 +8,53 @@ public class TCPClient {
 
     //Stream di byte da passare al Socket 
     DataOutputStream os = new DataOutputStream(socket.getOutputStream()); 
-    BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    DataInputStream is = new DataInputStream(socket.getInputStream());
     BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-    //Ciclo infinito per inserimento testo del Client
-    boolean exit = true;
-    while (exit) {
-      System.out.print("Inserisci un numero [0 - 100]: "); 
-      String userInput = stdIn.readLine();
-      os.writeBytes(userInput + '\n');
-      String result = is.readLine();
-      try{
-        int n_tentativi = Integer.parseInt(result);
-        System.out.println("Hai indovinato il numero in "+n_tentativi+" tentativi");
-        exit = false;
-      } catch (NumberFormatException e) {
-        String[] split = result.split(":");
-        if (split[0].compareTo("Error") == 0)
-          System.out.println(split[1]);
-        else {
-          System.out.println("Tentativo "+split[1]+": "+split[0]);
-          if (split[1].compareTo("5") == 0) {
-            String[] end_split = is.readLine().split(":");
-            System.out.println("Non hai indovinato, il numero da indovinare era "+end_split[1]);
-            exit = false;
-          }
+    // input dimensione iniziale tabella
+    os.writeUTF("GRID_SIZE:"+Utilities.getInputNumberLowerThan(stdIn, "Inserire la lunghezza del lato della griglia (max 10) : ", 11));
+
+    // richiesta delle navi (quante navi, dimensione ciascuna nave)
+    String resp = is.readUTF();
+    String response[] = resp.split(":");
+    int[] navi = null;
+    // controlla se c'è stato un errore
+    if (response[0].compareTo("ERROR")==0) {
+      System.out.println(response[1]);
+      os.close();
+      is.close();
+      socket.close();
+      return;
+    } else if (response[0].compareTo("SHIPS_NUMBER")==0) {
+      navi = new int[Integer.parseInt(response[1])];
+      for (int i = 0; i < navi.length; i++) {
+        response = is.readUTF().split(":");
+        if (response[0].compareTo("SHIP_SIZE")==0) {
+          navi[i] = Integer.parseInt(response[1]);
+        } else {
+          System.out.println("Il programma ha riscontrato un problema. Termino l'esecuzione.");
+          socket.close();
+          os.close();
+          is.close();
+          return;
         }
       }
+    } else {
+      System.out.println("Il programma ha riscontrato un problema. Termino l'esecuzione.");
+      socket.close();
+      os.close();
+      is.close();
+      return;
+    }
+
+    // TODO inserimento navi all'interno della griglia
+
+    // TODO invio posizione navi al server
+
+    // TODO ciclo di tentavi di affondaggio navi server
+    boolean exit = true;
+    while (exit) {
+      exit = false;
     }
     
     //Chiusura dello Stream e del Socket 
