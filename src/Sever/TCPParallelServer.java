@@ -7,7 +7,8 @@ public class TCPParallelServer {
     ServerSocket serverSocket = new ServerSocket(7777);
 
     //Ciclo infinito di ascolto dei Client
-    while(true) {
+    boolean repeat = true;
+    while(repeat) {
       System.out.println(" Attesa ");
       Socket socket = serverSocket.accept();
       System.out.println("Ricezione una chiamata di apertura da:\n" + socket);
@@ -15,6 +16,8 @@ public class TCPParallelServer {
       ServerThread serverThread = new ServerThread(socket);
       serverThread.start();
     }
+    serverSocket.close(); // solo per silenziare errore
+
   }
 
   public static void main (String[] args) throws Exception {
