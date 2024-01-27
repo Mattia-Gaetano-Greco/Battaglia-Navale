@@ -2,6 +2,7 @@
 import java.net.*;
 
 import Shared.Griglia;
+import Shared.Utilities;
 
 import java.io.*;
 
@@ -19,19 +20,18 @@ class ServerThread extends Thread {
   //esecuzione del Thread sul Socket
   public void run() {
     try {
-      Griglia server;
-      Griglia client;
+      Griglia serverGriglia;
+      Griglia clientGriglia;
       // input - output
       DataInputStream is = new DataInputStream(socket.getInputStream());
       DataOutputStream os = new DataOutputStream(socket.getOutputStream());
       
       // prende l'input della dimensione della griglia dal client
-      String msg = is.readUTF();
-      String[] response = msg.split(":");
+      String response = is.readUTF();
       int size_griglia;
-      if (response[0].compareTo("GRID_SIZE")==0)
+      if (Utilities.getResponseHeader(response).compareTo("GRID_SIZE")==0)
         try {
-          size_griglia = Integer.parseInt(response[1]);
+          size_griglia = Integer.parseInt(Utilities.getResponseValue(response));
         } catch (Exception e) {
           System.out.println("Errore nel parsing! Assegno numero casuale a size_griglia");
           size_griglia = 5;
@@ -42,11 +42,11 @@ class ServerThread extends Thread {
       }
 
       // crea la griglia del server e del client
-      server = new Griglia(size_griglia);
-      client = new Griglia(size_griglia);
+      serverGriglia = new Griglia(size_griglia);
+      clientGriglia = new Griglia(size_griglia);
       System.out.println("Griglia: ");
-      System.out.println(server.toString());
-      os.writeUTF("GRID_REPR:"+client.toString());
+      System.out.println(serverGriglia.toString());
+      os.writeUTF("GRID_REPR:"+clientGriglia.toString());
 
       // invia al client il numero di navi e la dimensione di ciascuna
 
@@ -61,12 +61,22 @@ class ServerThread extends Thread {
      *  3c. posizione confermata   
      */
 
-      os.writeUTF("SHIPS_NUMBER:"+navi.length);
+      //os.writeUTF("END_SHIPS:"+navi.length);
       for (int nave : navi) {
-        os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
+        boolean valid = false;
+        while (!valid) {
+          os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
+          os.writeUTF("GRID_REPR:"+clientGriglia.toString());
+          int row = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROW ???
+          int col = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_COL ???
+          int rot = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROT ???
+          if (clientGriglia.placeBarca(row, col, rot, nave))
+            valid = true;
+          else
+            os.writeUTF("BAD_PLACE:_");
+        }
       }
-      
-      // TODO riceve dal client il posizionamento di ciascuna nave
+      os.writeUTF("END_SHIPS");
 
       // TODO posiziona le navi del server in maniera casuale
 

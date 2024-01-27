@@ -45,17 +45,15 @@ public class TCPClient {
         System.out.println(Utilities.getResponseValue(response)); // check se l'header è GRID_REPR ??
         os.writeUTF("INIT_ROW:"+Utilities.getInputNumber(stdIn, "Inserire la riga iniziale della nave: "));
         os.writeUTF("INIT_COL:"+Utilities.getInputNumber(stdIn, "Inserire la colonna iniziale della nave: "));
-        os.writeUTF("INIT_ROT:"+Utilities.getInputNumberFromList(stdIn, "Inserire la rotazione della nave [Nord: 1; Est: 2; Sud: 3; Ovest: 4]", new int[]{1,2,3,4}));
-        response = is.readUTF();
-        System.out.println(response);      
+        os.writeUTF("INIT_ROT:"+Utilities.getInputNumberFromList(stdIn, "Inserire la rotazione della nave [Nord: 1; Est: 2; Sud: 3; Ovest: 4]: ", new int[]{1,2,3,4})); 
+      } else if (Utilities.getResponseHeader(response).compareTo("BAD_PLACE")==0) {
+        System.out.println("La barca non può essere posizionata con questi parametri!");
       } else {
         closeConnectionError();
         return;
       }
+      response = is.readUTF();
     }
-    // TODO inserimento navi all'interno della griglia
-
-    // TODO invio posizione navi al server
 
     // TODO ciclo di tentavi di affondaggio navi server
     boolean exit = true;
