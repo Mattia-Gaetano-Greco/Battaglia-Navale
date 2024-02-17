@@ -50,33 +50,23 @@ class ServerThread extends Thread {
 
       // invia al client il numero di navi e la dimensione di ciascuna
 
-      /*
-     * Per la richiesta navi: (ADATTARLO AL SERVER, QUESTA è LA VERSIONE DEL CLIENT)
-     * ciclo finchè il server non mi restituisce "END_SHIPS"
-     * 1. il server mi da la dimensione della nave insieme all'immagine della griglia attuale
-     * 2. inserisco in input riga e colonna iniziale della nave e orientamento (Nord - sud - ovest - est)
-     * 3. il server mi restituisce:
-     *  3a. posizione non valida! La barca esce dai confini della griglia
-     *  3b. posizione non valida! La barca si sovrappone ad un'altra barca
-     *  3c. posizione confermata   
-     */
-
-      //os.writeUTF("END_SHIPS:"+navi.length);
-      for (int nave : navi) {
+      for (int i = 0; i < navi.length; i++) {
         boolean valid = false;
         while (!valid) {
+          int nave = navi[i];
           os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
           os.writeUTF("GRID_REPR:"+clientGriglia.toString());
           int row = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROW ???
           int col = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_COL ???
           int rot = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROT ???
-          if (clientGriglia.placeBarca(row, col, rot, nave))
+          if (clientGriglia.placeBarca(row, col, rot, nave, i))
             valid = true;
           else
             os.writeUTF("BAD_PLACE:_");
         }
       }
       os.writeUTF("END_SHIPS");
+      os.writeUTF("GRID_REPR:"+clientGriglia.toString());
 
       // TODO posiziona le navi del server in maniera casuale
 

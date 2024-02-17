@@ -55,6 +55,16 @@ public class TCPClient {
       response = is.readUTF();
     }
 
+    response = is.readUTF();
+
+    if (Utilities.getResponseHeader(response).compareTo("GRID_REPR") == 0) {
+      System.out.println("\n\nGriglia completa:\n");
+      System.out.println(Utilities.getResponseValue(response));
+    } else {
+      closeConnectionError();
+      return;
+    }
+
     // TODO ciclo di tentavi di affondaggio navi server
     boolean exit = true;
     while (exit) {

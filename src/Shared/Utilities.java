@@ -36,22 +36,10 @@ public class Utilities {
     }
 
     /*
-     * Returns 0 if the number is not a barca number, the number of the barca if the number is the number of a valid barca 
+     * Returns 1 if not hit, 2 if hit, 3 if hit and sank
      */
-    public static int isValidBarcaNumber(int num) {
-        String s = String.valueOf(num);
-        String sub = s.substring(s.length() - 2);
-        if (sub.compareTo("1") == 0 || sub.compareTo("2") == 0)
-            return Integer.parseInt(s.substring(0, s.length() - 2));
-        return 0;
-    }
-
-    /*
-     * Returns 1 if not hit, 2 if hit
-     */
-    public static int getBarcaStatus(int num) {
-        String s = String.valueOf(num);
-        return Integer.parseInt(s.substring(s.length() - 2));
+    public static int getBarcaStatus(String barca) {
+        return Integer.parseInt(barca.split("-")[1]);
     }
 
 
