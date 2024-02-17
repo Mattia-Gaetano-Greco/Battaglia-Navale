@@ -56,25 +56,9 @@ class ServerThread extends Thread {
           int row = 0, col = 0, rot = 0;
           os.writeUTF("GRID_REPR:"+clientGriglia.toString());
           os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
-
-          response = is.readUTF();
-          if (Utilities.responseHeaderEquals(response, "INIT_ROW"))
-            row = Integer.parseInt(Utilities.getResponseValue(response));
-          else
-            os.writeUTF("ERROR:Atteso header 'INIT_ROW', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
-
-          response = is.readUTF();
-          if (Utilities.responseHeaderEquals(response, "INIT_COL"))
-            col = Integer.parseInt(Utilities.getResponseValue(response));
-          else
-            os.writeUTF("ERROR:Atteso header 'INIT_COL', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
-          
-          response = is.readUTF();
-          if (Utilities.responseHeaderEquals(response, "INIT_ROT"))
-            rot = Integer.parseInt(Utilities.getResponseValue(response));
-          else
-            os.writeUTF("ERROR:Atteso header 'INIT_ROT', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
-          
+          row = getValueIfHeader(is, os, "INIT_ROW");
+          col = getValueIfHeader(is, os, "INIT_COL");
+          rot = getValueIfHeader(is, os, "INIT_ROT");
           if (clientGriglia.placeBarca(row, col, rot, nave, i))
             valid = true;
           else
@@ -94,4 +78,18 @@ class ServerThread extends Thread {
       System.out.println("IOException: " + e);
     }
   }
+
+  private int getValueIfHeader(DataInputStream is, DataOutputStream os, String expected_header) {
+    String response = "";
+    try {
+      response = is.readUTF();
+    } catch (Exception e) {}
+    if (Utilities.responseHeaderEquals(response, expected_header))
+      return Integer.parseInt(Utilities.getResponseValue(response));
+    try {
+      os.writeUTF("ERROR:Atteso header \""+expected_header+"\", ma ottenuto header \"" + Utilities.getResponseHeader(response) + "\"");
+    } catch (Exception e) {}
+    return -1;
+  }
+
 }
