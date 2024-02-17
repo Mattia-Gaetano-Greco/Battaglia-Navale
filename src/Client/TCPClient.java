@@ -24,7 +24,7 @@ public class TCPClient {
 
     // griglia
     String response = is.readUTF();
-    if (Utilities.getResponseHeader(response).compareTo("GRID_REPR")==0){
+    if (Utilities.responseHeaderEquals(response, "GRID_REPR")){
       System.out.println(Utilities.getResponseValue(response));
     } else {
       closeConnectionError();
@@ -33,20 +33,20 @@ public class TCPClient {
     
     // richiesta delle navi (quante navi, dimensione ciascuna nave)
     response = is.readUTF();
-    while (Utilities.getResponseHeader(response).compareTo("END_SHIPS") != 0) {
+    while (!Utilities.responseHeaderEquals(response, "END_SHIPS")) {
       // controlla se c'è stato un errore
-      if (Utilities.getResponseHeader(response).compareTo("ERROR")==0) {
+      if (Utilities.responseHeaderEquals(response, "ERROR")) {
         System.out.println(Utilities.getResponseValue(response));
         closeConnection();
         return;
-      } else if (Utilities.getResponseHeader(response).compareTo("SHIP_SIZE")==0) {
+      } else if (Utilities.responseHeaderEquals(response, "GRID_REPR")) {
+        System.out.println(Utilities.getResponseValue(response));
+      } else if (Utilities.responseHeaderEquals(response, "SHIP_SIZE")) {
         System.out.println("Dimensione barca da inserire: "+Integer.parseInt(Utilities.getResponseValue(response)));
-        response = is.readUTF();
-        System.out.println(Utilities.getResponseValue(response)); // check se l'header è GRID_REPR ??
         os.writeUTF("INIT_ROW:"+Utilities.getInputNumber(stdIn, "Inserire la riga iniziale della nave: "));
         os.writeUTF("INIT_COL:"+Utilities.getInputNumber(stdIn, "Inserire la colonna iniziale della nave: "));
         os.writeUTF("INIT_ROT:"+Utilities.getInputNumberFromList(stdIn, "Inserire la rotazione della nave [Nord: 1; Est: 2; Sud: 3; Ovest: 4]: ", new int[]{1,2,3,4})); 
-      } else if (Utilities.getResponseHeader(response).compareTo("BAD_PLACE")==0) {
+      } else if (Utilities.responseHeaderEquals(response, "BAD_PLACE")) {
         System.out.println("La barca non può essere posizionata con questi parametri!");
       } else {
         closeConnectionError();
@@ -55,9 +55,9 @@ public class TCPClient {
       response = is.readUTF();
     }
 
+    // rappresentazione griglia con tutte le barche posizionate
     response = is.readUTF();
-
-    if (Utilities.getResponseHeader(response).compareTo("GRID_REPR") == 0) {
+    if (Utilities.responseHeaderEquals(response, "GRID_REPR")) {
       System.out.println("\n\nGriglia completa:\n");
       System.out.println(Utilities.getResponseValue(response));
     } else {

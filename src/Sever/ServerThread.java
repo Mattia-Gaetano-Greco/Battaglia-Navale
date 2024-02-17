@@ -29,7 +29,7 @@ class ServerThread extends Thread {
       // prende l'input della dimensione della griglia dal client
       String response = is.readUTF();
       int size_griglia;
-      if (Utilities.getResponseHeader(response).compareTo("GRID_SIZE")==0)
+      if (Utilities.responseHeaderEquals(response, "GRID_SIZE"))
         try {
           size_griglia = Integer.parseInt(Utilities.getResponseValue(response));
         } catch (Exception e) {
@@ -49,16 +49,32 @@ class ServerThread extends Thread {
       os.writeUTF("GRID_REPR:"+clientGriglia.toString());
 
       // invia al client il numero di navi e la dimensione di ciascuna
-
       for (int i = 0; i < navi.length; i++) {
         boolean valid = false;
         while (!valid) {
           int nave = navi[i];
-          os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
+          int row = 0, col = 0, rot = 0;
           os.writeUTF("GRID_REPR:"+clientGriglia.toString());
-          int row = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROW ???
-          int col = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_COL ???
-          int rot = Integer.parseInt(Utilities.getResponseValue(is.readUTF())); // check header == INIT_ROT ???
+          os.writeUTF("SHIP_SIZE:"+String.valueOf(nave));
+
+          response = is.readUTF();
+          if (Utilities.responseHeaderEquals(response, "INIT_ROW"))
+            row = Integer.parseInt(Utilities.getResponseValue(response));
+          else
+            os.writeUTF("ERROR:Atteso header 'INIT_ROW', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
+
+          response = is.readUTF();
+          if (Utilities.responseHeaderEquals(response, "INIT_COL"))
+            col = Integer.parseInt(Utilities.getResponseValue(response));
+          else
+            os.writeUTF("ERROR:Atteso header 'INIT_COL', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
+          
+          response = is.readUTF();
+          if (Utilities.responseHeaderEquals(response, "INIT_ROT"))
+            rot = Integer.parseInt(Utilities.getResponseValue(response));
+          else
+            os.writeUTF("ERROR:Atteso header 'INIT_ROT', ma ottenuto header '" + Utilities.getResponseHeader(response) + "'");
+          
           if (clientGriglia.placeBarca(row, col, rot, nave, i))
             valid = true;
           else
@@ -66,6 +82,8 @@ class ServerThread extends Thread {
         }
       }
       os.writeUTF("END_SHIPS");
+      
+      // invia al client la sua griglia con tutte le barche posizionate
       os.writeUTF("GRID_REPR:"+clientGriglia.toString());
 
       // TODO posiziona le navi del server in maniera casuale

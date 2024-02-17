@@ -47,6 +47,10 @@ public class Utilities {
         return response.split(":")[0];
     }
 
+    public static boolean responseHeaderEquals(String response, String expected_header) {
+        return response.split(":")[0].compareTo(expected_header) == 0;
+    } 
+
     public static String getResponseValue(String response) {
         return response.split(":")[1];
     }
