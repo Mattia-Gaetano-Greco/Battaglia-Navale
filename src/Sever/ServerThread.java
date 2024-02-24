@@ -1,6 +1,4 @@
-//Importo i package
 import java.net.*;
-
 import Shared.Griglia;
 import Shared.Utilities;
 
@@ -70,7 +68,19 @@ class ServerThread extends Thread {
       // invia al client la sua griglia con tutte le barche posizionate
       os.writeUTF("GRID_REPR:"+clientGriglia.toString());
 
-      // TODO posiziona le navi del server in maniera casuale
+      // posiziona le navi del server in maniera casuale
+      for (int i = 0; i < navi.length; i++) {
+        boolean valid = false;
+        while (!valid) {
+          int nave = navi[i];
+          int row = (int)(Math.random() * (serverGriglia.getSize() - 1));
+          int col = (int)(Math.random() * (serverGriglia.getSize() - 1));
+          int rot = (int)(Math.random() * 3 + 1);
+          if (serverGriglia.placeBarca(row, col, rot, nave, i))
+            valid = true;
+        }
+      }
+      System.out.println(serverGriglia.toString());
 
       // TODO ciclo di tentativi per affondaggio navi client
     }

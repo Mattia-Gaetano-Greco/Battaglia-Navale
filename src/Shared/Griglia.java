@@ -14,6 +14,10 @@ public class Griglia {
         }
     }
 
+    public int getSize() {
+        return griglia.length;
+    }
+
     public String toString() {
         String s = "   ";
         for (int i = 0; i < griglia.length; i++)
@@ -56,8 +60,7 @@ public class Griglia {
         for (int i = 0; i < length; i++) {
             int currRow = row + yAdd * i;
             int currCol = column + xAdd * i;
-            if (currRow >= griglia.length || currCol >= griglia[0].length || griglia[currRow][currCol] != "000") {
-                System.out.println(currRow + " " + currCol);
+            if (currRow < 0 || currCol < 0 || currRow >= griglia.length || currCol >= griglia[0].length || griglia[currRow][currCol] != "000") {
                 return false;
             }
         }

@@ -1,4 +1,3 @@
-//Importo i package
 import java.net.*;
 
 //Classe Server per attivare la Socket
