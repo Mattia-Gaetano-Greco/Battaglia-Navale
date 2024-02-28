@@ -35,6 +35,10 @@ public class Utilities {
         return getInputNumberFromList(input, reqmsg, list);
     }
 
+    public static int getBarcaNumber(String barca) {
+        return Integer.parseInt(barca.split("-")[0]);
+    }
+
     /*
      * Returns 1 if not hit, 2 if hit, 3 if hit and sank
      */

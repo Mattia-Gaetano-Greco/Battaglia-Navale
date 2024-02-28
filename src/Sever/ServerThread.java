@@ -82,7 +82,20 @@ class ServerThread extends Thread {
       }
       System.out.println(serverGriglia.toString());
 
-      // TODO ciclo di tentativi per affondaggio navi client
+      // inizio partita
+      boolean fine = false;
+      Griglia grigliaTentativiServer = new Griglia(size_griglia);
+      Griglia grigliaTentativiClient = new Griglia(size_griglia);
+
+      // ciclo di tentativi per affondaggio navi
+      while (!fine) {
+        // chiede al client la posizione che vuole colpire
+        os.writeUTF("GIVE_POS:_");
+        int row = getValueIfHeader(is, os, "INIT_ROW");
+        int col = getValueIfHeader(is, os, "INIT_COL");
+        int rot = getValueIfHeader(is, os, "INIT_ROT");
+      }
+
     }
     catch (IOException e) {
       System.out.println("IOException: " + e);
